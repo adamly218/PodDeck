@@ -30,6 +30,8 @@ struct BatteryRing: View {
             Text(part.label.isEmpty ? "\(part.level)%" : "\(part.label) \(part.level)%")
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(.secondary)
+                .lineLimit(1)
+                .fixedSize()
         }
     }
 }
@@ -49,10 +51,15 @@ struct BatteryPill: View {
                     .frame(width: max(2, 20 * CGFloat(part.level) / 100))
             }
             .frame(width: 20, height: 9)
-            Text(part.charging ? "\(part.level)%⚡︎" : "\(part.level)%")
+            Text("\(part.level)%")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .monospacedDigit()
+            if part.charging {
+                Image(systemName: "bolt.fill").font(.system(size: 8, weight: .bold)).foregroundColor(.green)
+            }
         }
+        .lineLimit(1)
+        .fixedSize()
     }
 }
 

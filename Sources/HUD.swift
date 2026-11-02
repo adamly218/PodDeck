@@ -95,9 +95,11 @@ struct HUDView: View {
                 }
                 if let device, !device.battery.isEmpty {
                     if compact {
-                        HStack(spacing: 8) { ForEach(device.battery.parts) { BatteryPill(part: $0) } }
+                        HStack(spacing: 10) { ForEach(device.battery.parts) { BatteryPill(part: $0) } }
+                            .fixedSize()
                     } else {
-                        HStack(spacing: 14) { ForEach(device.battery.parts) { BatteryRing(part: $0, size: 38) } }
+                        HStack(spacing: 16) { ForEach(device.battery.parts) { BatteryRing(part: $0, size: 38) } }
+                            .fixedSize()
                     }
                 }
             }
@@ -119,7 +121,8 @@ struct HUDView: View {
             }
         }
         .padding(compact ? 12 : 16)
-        .frame(width: compact ? 320 : 400)
+        .frame(minWidth: compact ? 320 : 400)
+        .fixedSize()
         .background(VisualEffectBackground(material: .hudWindow, cornerRadius: compact ? 16 : 22))
         .clipShape(RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous))
     }
