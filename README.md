@@ -1,6 +1,10 @@
-# PodDeck
+<p align="center">
+  <img src="icon/icon.png" width="160" alt="PodDeck icon">
+</p>
 
-A menu bar companion for AirPods, Beats and Apple accessories on macOS.
+<h1 align="center">PodDeck</h1>
+
+<p align="center">A menu bar companion for AirPods, Beats and Apple accessories on macOS.</p>
 
 ## Screenshots
 
