@@ -138,3 +138,65 @@ enum PowerSources {
         return nil
     }
 }
+
+struct MobileDevice {
+    let udid: String
+    let name: String
+    let isTablet: Bool
+    let battery: Battery
+}
+
+/// iPhone and iPad batteries over USB or Wi-Fi sync, using libimobiledevice
+/// (`brew install libimobiledevice`). Returns nothing if it isn't installed.
+enum MobileDevices {
+    private static let toolDir = ["/opt/homebrew/bin", "/usr/local/bin"].first {
+        FileManager.default.isExecutableFile(atPath: $0 + "/ideviceinfo")
+    }
+
+    static var isAvailable: Bool { toolDir != nil }
+
+    static func fetch(completion: @escaping ([MobileDevice]) -> Void) {
+        guard let toolDir else { return completion([]) }
+        DispatchQueue.global(qos: .utility).async {
+            var out: [MobileDevice] = []
+            // Lines look like "<udid> (USB)" or "<udid> (Network)".
+            for line in run(toolDir + "/idevice_id", []).split(separator: "\n") {
+                let fields = line.split(separator: " ")
+                guard let udid = fields.first.map(String.init), out.allSatisfy({ $0.udid != udid }) else { continue }
+                let network = line.contains("(Network)") ? ["-n"] : []
+                let base = network + ["-u", udid]
+                let info = keyValues(run(toolDir + "/ideviceinfo", base))
+                let power = keyValues(run(toolDir + "/ideviceinfo", base + ["-q", "com.apple.mobile.battery"]))
+                guard let level = power["BatteryCurrentCapacity"].flatMap(Int.init) else { continue }
+                var battery = Battery()
+                battery.main = level
+                battery.mainCharging = power["BatteryIsCharging"] == "true"
+                out.append(MobileDevice(udid: udid, name: info["DeviceName"] ?? "iPhone",
+                                        isTablet: info["DeviceClass"] == "iPad", battery: battery))
+            }
+            DispatchQueue.main.async { completion(out) }
+        }
+    }
+
+    private static func keyValues(_ text: String) -> [String: String] {
+        var dict: [String: String] = [:]
+        for line in text.split(separator: "\n") {
+            guard let colon = line.firstIndex(of: ":") else { continue }
+            dict[String(line[..<colon])] = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
+        }
+        return dict
+    }
+
+    private static func run(_ tool: String, _ args: [String]) -> String {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: tool)
+        process.arguments = args
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        guard (try? process.run()) != nil else { return "" }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        return String(decoding: data, as: UTF8.self)
+    }
+}

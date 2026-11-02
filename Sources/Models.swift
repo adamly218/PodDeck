@@ -66,7 +66,7 @@ struct Device: Identifiable, Equatable {
     var statusText: String {
         if kind == .mac { return battery.mainCharging ? "This Mac · Charging" : "This Mac" }
         if address == nil { return "Connected" }
-        if !canConnect { return "Paired for Continuity" }
+        if !canConnect { return MobileDevices.isAvailable && kind != .watch ? "Turn on Wi-Fi sync to see battery" : "Paired for Continuity" }
         return isConnected ? "Connected" : "Not connected"
     }
 }

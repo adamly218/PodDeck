@@ -26,6 +26,7 @@ final class DeviceStore: ObservableObject {
     private var profiler: [String: ProfilerEntry] = [:]
     private var accessories: [AccessoryBattery] = []
     private var mac: Battery?
+    private var mobiles: [MobileDevice] = []
     private var readings: [Int: HeadsetReading] = [:]
     private var lastNearbyHUD: [Int: Date] = [:]
     private var lowAlerted: Set<String> = []
@@ -40,9 +41,11 @@ final class DeviceStore: ObservableObject {
         scanner.start()
         refresh()
         refreshProfiler()
+        refreshMobiles()
         timers = [
             Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in self?.refresh() },
             Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in self?.refreshProfiler() },
+            Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in self?.refreshMobiles() },
         ]
     }
 
@@ -75,6 +78,13 @@ final class DeviceStore: ObservableObject {
             guard let self, !entries.isEmpty else { return }
             self.profiler = entries
             self.rebuild()
+        }
+    }
+
+    private func refreshMobiles() {
+        MobileDevices.fetch { [weak self] found in
+            self?.mobiles = found
+            self?.rebuild()
         }
     }
 
@@ -112,6 +122,7 @@ final class DeviceStore: ObservableObject {
         var list: [Device] = []
         var usedReadings = Set<Int>()
         var usedAccessories = Set<Int>()
+        var usedMobiles = Set<String>()
 
         for p in paired.sorted(by: { $0.connected && !$1.connected }) {
             let entry = profiler[p.address]
@@ -132,6 +143,10 @@ final class DeviceStore: ObservableObject {
 
             let kind = model != nil ? DeviceKind.headset : guessKind(name: p.name, classMajor: p.classMajor,
                                                                     minorType: entry?.minorType)
+            if kind == .phone || kind == .tablet, let m = mobiles.first(where: { $0.name == p.name }) {
+                usedMobiles.insert(m.udid)
+                battery = m.battery
+            }
             list.append(Device(id: "bt-\(p.address)", name: p.name, kind: kind,
                                symbol: symbol(for: kind, model: model),
                                battery: battery, isConnected: p.connected, address: p.address,
@@ -143,6 +158,12 @@ final class DeviceStore: ObservableObject {
             list.append(Device(id: "hid-\(a.name)", name: a.name, kind: kind, symbol: symbol(for: kind, model: nil),
                                battery: Battery(main: a.percent, mainCharging: a.charging),
                                isConnected: true, address: nil, modelName: nil))
+        }
+
+        for m in mobiles where !usedMobiles.contains(m.udid) {
+            let kind: DeviceKind = m.isTablet ? .tablet : .phone
+            list.append(Device(id: "ios-\(m.udid)", name: m.name, kind: kind, symbol: symbol(for: kind, model: nil),
+                               battery: m.battery, isConnected: true, address: nil, modelName: nil))
         }
 
         if let mac {
