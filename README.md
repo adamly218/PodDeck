@@ -2,6 +2,27 @@
 
 A menu bar companion for AirPods, Beats and Apple accessories on macOS.
 
+## Screenshots
+
+<p>
+  <img src="docs/screenshots/dashboard.png" width="410" alt="Dashboard">
+</p>
+
+**HUD** (large and compact)
+
+<p>
+  <img src="docs/screenshots/hud-large.png" width="440" alt="HUD, large style">
+  <img src="docs/screenshots/hud-compact.png" width="430" alt="HUD, compact style">
+</p>
+
+**Desktop widget** (small, medium and large)
+
+<p>
+  <img src="docs/screenshots/widget-small.png" width="215" alt="Small widget">
+  <img src="docs/screenshots/widget-medium.png" width="410" alt="Medium widget">
+  <img src="docs/screenshots/widget-large.png" width="410" alt="Large widget">
+</p>
+
 ## Features
 
 - **Dashboard** in the menu bar: every paired device with battery levels (left, right, case) and a Connect / Disconnect button. Right-click a device to pin it, mute its alerts or show it in the HUD.

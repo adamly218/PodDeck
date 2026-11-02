@@ -68,7 +68,7 @@ struct DashboardView: View {
             .font(.callout)
             .padding(.horizontal, 14).padding(.vertical, 10)
         }
-        .frame(width: 360)
+        .frame(width: 410)
         .background(VisualEffectBackground(material: .popover, cornerRadius: 12))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.primary.opacity(0.12)))
@@ -117,6 +117,7 @@ struct DeviceRow: View {
                 } else {
                     Button(device.isConnected ? "Disconnect" : "Connect", action: toggleConnection)
                         .controlSize(.small)
+                        .fixedSize()
                 }
             }
         }

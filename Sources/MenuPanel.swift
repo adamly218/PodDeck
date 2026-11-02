@@ -19,7 +19,7 @@ final class MenuPanel {
     init(makeView: @escaping (CGFloat) -> DashboardView) {
         self.makeView = makeView
         host = NSHostingView(rootView: makeView(440))
-        panel = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: 360, height: 300),
+        panel = KeyPanel(contentRect: NSRect(x: 0, y: 0, width: 410, height: 300),
                          styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
         panel.level = .popUpMenu
         panel.isOpaque = false
