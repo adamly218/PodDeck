@@ -39,6 +39,7 @@ final class Settings: ObservableObject {
     @Published var mutedAlertIDs: Set<String> { didSet { defaults.set(Array(mutedAlertIDs), forKey: "mutedAlertIDs") } }
     @Published var pinnedIDs: Set<String> { didSet { defaults.set(Array(pinnedIDs), forKey: "pinnedIDs") } }
     @Published var showWidget: Bool { didSet { defaults.set(showWidget, forKey: "showWidget") } }
+    @Published var showMenuBarIcon: Bool { didSet { defaults.set(showMenuBarIcon, forKey: "showMenuBarIcon") } }
     @Published var menuBarPercent: Bool { didSet { defaults.set(menuBarPercent, forKey: "menuBarPercent") } }
     @Published var inputLockEnabled: Bool { didSet { defaults.set(inputLockEnabled, forKey: "inputLockEnabled") } }
     @Published var inputLockUID: String { didSet { defaults.set(inputLockUID, forKey: "inputLockUID") } }
@@ -50,6 +51,7 @@ final class Settings: ObservableObject {
             "lowThreshold": 20,
             "notifyFullCharge": false,
             "showWidget": false,
+            "showMenuBarIcon": true,
             "menuBarPercent": true,
             "inputLockEnabled": false,
         ])
@@ -63,6 +65,7 @@ final class Settings: ObservableObject {
         mutedAlertIDs = Set(defaults.stringArray(forKey: "mutedAlertIDs") ?? [])
         pinnedIDs = Set(defaults.stringArray(forKey: "pinnedIDs") ?? [])
         showWidget = defaults.bool(forKey: "showWidget")
+        showMenuBarIcon = defaults.bool(forKey: "showMenuBarIcon")
         menuBarPercent = defaults.bool(forKey: "menuBarPercent")
         inputLockEnabled = defaults.bool(forKey: "inputLockEnabled")
         inputLockUID = defaults.string(forKey: "inputLockUID") ?? ""

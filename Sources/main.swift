@@ -39,6 +39,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .store(in: &subscriptions)
         settings.$menuBarPercent.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateStatusItem() }
             .store(in: &subscriptions)
+        settings.$showMenuBarIcon.receive(on: DispatchQueue.main).sink { [weak self] visible in
+            self?.statusItem.isVisible = visible
+            if !visible { self?.menu.close() }
+        }
+        .store(in: &subscriptions)
         settings.$showWidget.receive(on: DispatchQueue.main).sink { [weak self] in self?.widget.setVisible($0) }
             .store(in: &subscriptions)
         settings.$inputLockEnabled.combineLatest(settings.$inputLockUID).receive(on: DispatchQueue.main)
@@ -47,6 +52,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
         store.start()
+
+        // Opened by hand (not at login) while the icon is hidden: bring it back.
+        if !settings.showMenuBarIcon && !launchedAsLoginItem() { restoreMenuBarIcon() }
+    }
+
+    /// Opening the app again (Finder, Spotlight, Launchpad, Dock) while it's running.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        restoreMenuBarIcon()
+        return false
+    }
+
+    private func restoreMenuBarIcon() {
+        settings.showMenuBarIcon = true
+        openSettings()
+    }
+
+    private func launchedAsLoginItem() -> Bool {
+        guard let event = NSAppleEventManager.shared().currentAppleEvent else { return false }
+        return event.eventID == kAEOpenApplication
+            && event.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
     }
 
     private func updateStatusItem() {

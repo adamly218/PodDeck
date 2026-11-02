@@ -21,7 +21,15 @@ struct SettingsView: View {
         Form {
             Toggle("Launch at login", isOn: Binding(get: { settings.launchAtLogin },
                                                     set: { settings.launchAtLogin = $0 }))
-            Toggle("Show lowest headset battery in the menu bar", isOn: $settings.menuBarPercent)
+            Section("Menu bar") {
+                Toggle("Show PodDeck in the menu bar", isOn: $settings.showMenuBarIcon)
+                Toggle("Show headset battery next to the icon", isOn: $settings.menuBarPercent)
+                    .disabled(!settings.showMenuBarIcon)
+                if !settings.showMenuBarIcon {
+                    Text("PodDeck keeps running in the background. To bring the icon back, open PodDeck again from Applications, Spotlight or Launchpad.")
+                        .font(.caption).foregroundColor(.secondary)
+                }
+            }
             Toggle("Show desktop widget", isOn: $settings.showWidget)
             Section("Audio Input Lock") {
                 Toggle("Keep this microphone selected", isOn: $settings.inputLockEnabled)
