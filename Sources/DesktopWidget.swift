@@ -46,11 +46,25 @@ final class DesktopWidgetController {
         panel.hasShadow = true
         panel.isMovableByWindowBackground = true
         panel.hidesOnDeactivate = false
-        let host = DraggableHostingView(rootView: WidgetView(store: store, settings: .shared))
+        let host = WidgetHostingView(rootView: WidgetView(store: store, settings: .shared))
         host.sizingOptions = []
         panel.contentView = host
         panel.setFrameAutosaveName("PodDeckDesktopWidget")
         return panel
+    }
+}
+
+/// Takes every click on the widget (it has no buttons) and drags the window with it.
+/// Without this the blur view underneath swallows the click and nothing moves.
+final class WidgetHostingView<Content: View>: NSHostingView<Content> {
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        frame.contains(point) ? self : nil
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    override func mouseDown(with event: NSEvent) {
+        window?.performDrag(with: event)
     }
 }
 
