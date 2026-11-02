@@ -59,9 +59,14 @@ struct Device: Identifiable, Equatable {
     var address: String?
     var modelName: String?
 
+    /// iPhone, iPad and Apple Watch are paired with the Mac for Continuity
+    /// (Handoff, Auto Unlock) but can't be connected to it like a headset.
+    var canConnect: Bool { address != nil && ![.phone, .tablet, .watch].contains(kind) }
+
     var statusText: String {
         if kind == .mac { return battery.mainCharging ? "This Mac · Charging" : "This Mac" }
         if address == nil { return "Connected" }
+        if !canConnect { return "Paired for Continuity" }
         return isConnected ? "Connected" : "Not connected"
     }
 }

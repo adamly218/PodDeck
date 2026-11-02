@@ -51,7 +51,7 @@ final class DeviceStore: ObservableObject {
     // MARK: Actions
 
     func setConnected(_ connect: Bool, _ device: Device) {
-        guard let address = device.address, !busyIDs.contains(device.id) else { return }
+        guard device.canConnect, let address = device.address, !busyIDs.contains(device.id) else { return }
         busyIDs.insert(device.id)
         BluetoothDevices.setConnected(connect, address: address) { [weak self] _ in
             guard let self else { return }
@@ -169,9 +169,12 @@ final class DeviceStore: ObservableObject {
         if n.contains("mouse") { return .mouse }
         if n.contains("trackpad") { return .trackpad }
         if n.contains("keyboard") { return .keyboard }
-        if n.contains("iphone") { return .phone }
+        if minorType == "Mouse" { return .mouse }
+        if minorType == "Keyboard" { return .keyboard }
+        if minorType == "Trackpad" { return .trackpad }
+        if n.contains("iphone") || classMajor == 0x02 { return .phone }
         if n.contains("ipad") { return .tablet }
-        if n.contains("watch") { return .watch }
+        if n.contains("watch") || classMajor == 0x07 { return .watch }
         if classMajor == 0x04 || minorType == "Headphones" || minorType == "Headset" || n.contains("airpods")
             || n.contains("beats") || n.contains("headphone") || n.contains("buds") { return .headset }
         return .other

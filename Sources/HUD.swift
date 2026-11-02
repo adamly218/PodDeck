@@ -105,7 +105,7 @@ struct HUDView: View {
             VStack(spacing: 8) {
                 Button(action: close) { Image(systemName: "xmark").font(.system(size: 10, weight: .bold)) }
                     .buttonStyle(.borderless).foregroundColor(.secondary)
-                if let device, device.address != nil {
+                if let device, device.canConnect {
                     if store.busyIDs.contains(device.id) {
                         ProgressView().controlSize(.small)
                     } else {

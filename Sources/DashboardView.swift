@@ -111,7 +111,7 @@ struct DeviceRow: View {
                 }
             }
             Spacer(minLength: 4)
-            if device.address != nil {
+            if device.canConnect {
                 if busy {
                     ProgressView().controlSize(.small)
                 } else {
