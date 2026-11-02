@@ -6,6 +6,7 @@ struct DashboardView: View {
     @ObservedObject var audio: AudioInputLock
     let openSettings: () -> Void
     let showHUD: (String) -> Void
+    var maxListHeight: CGFloat = 440
 
     private var mainDevices: [Device] {
         store.devices.filter { $0.isConnected || $0.kind == .mac || settings.pinnedIDs.contains($0.id) || !$0.battery.isEmpty }
@@ -48,7 +49,7 @@ struct DashboardView: View {
                 }
                 .padding(10)
             }
-            .frame(height: min(440, CGFloat(store.devices.count) * 58 + (otherDevices.isEmpty ? 30 : 60) + (mainDevices.isEmpty ? 80 : 0)))
+            .frame(height: min(maxListHeight, CGFloat(store.devices.count) * 58 + (otherDevices.isEmpty ? 30 : 60) + (mainDevices.isEmpty ? 80 : 0)))
 
             Divider()
 
@@ -68,6 +69,9 @@ struct DashboardView: View {
             .padding(.horizontal, 14).padding(.vertical, 10)
         }
         .frame(width: 360)
+        .background(VisualEffectBackground(material: .popover))
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.primary.opacity(0.12)))
     }
 
     private func row(_ device: Device) -> some View {

@@ -8,7 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = DeviceStore()
     private let audio = AudioInputLock()
     private var statusItem: NSStatusItem!
-    private let popover = NSPopover()
+    private var menu: MenuPanel!
     private var hud: HUDController!
     private var widget: DesktopWidgetController!
     private var settingsWindow: NSWindow?
@@ -25,13 +25,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.imagePosition = .imageLeading
         updateStatusItem()
 
-        popover.behavior = .transient
-        popover.contentViewController = NSHostingController(rootView: DashboardView(
-            store: store, settings: settings, audio: audio,
-            openSettings: { [weak self] in self?.openSettings() },
-            showHUD: { [weak self] in self?.hud.show(.connected($0)) }))
+        menu = MenuPanel { [unowned self] maxListHeight in
+            DashboardView(store: store, settings: settings, audio: audio,
+                          openSettings: { [weak self] in self?.openSettings() },
+                          showHUD: { [weak self] in self?.hud.show(.connected($0)) },
+                          maxListHeight: maxListHeight)
+        }
 
-        store.$devices.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateStatusItem() }
+        store.$devices.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateStatusItem()
+            if self?.menu.isShown == true { self?.menu.layout() }
+        }
             .store(in: &subscriptions)
         settings.$menuBarPercent.receive(on: DispatchQueue.main).sink { [weak self] _ in self?.updateStatusItem() }
             .store(in: &subscriptions)
@@ -61,16 +65,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func togglePopover() {
         guard let button = statusItem.button else { return }
-        if popover.isShown {
-            popover.performClose(nil)
+        if menu.isShown {
+            menu.close()
         } else {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            popover.contentViewController?.view.window?.makeKey()
+            menu.show(below: button)
         }
     }
 
     private func openSettings() {
-        popover.performClose(nil)
+        menu.close()
         if settingsWindow == nil {
             let window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: false)
             window.title = "PodDeck Settings"
