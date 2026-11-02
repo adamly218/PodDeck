@@ -13,6 +13,12 @@ enum HUDStyle: String, CaseIterable, Identifiable {
     var title: String { rawValue.capitalized }
 }
 
+enum WidgetSize: String, CaseIterable, Identifiable {
+    case small, medium, large
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+}
+
 enum AlertStyle: String, CaseIterable, Identifiable {
     case hud, notification, both
     var id: String { rawValue }
@@ -39,6 +45,7 @@ final class Settings: ObservableObject {
     @Published var mutedAlertIDs: Set<String> { didSet { defaults.set(Array(mutedAlertIDs), forKey: "mutedAlertIDs") } }
     @Published var pinnedIDs: Set<String> { didSet { defaults.set(Array(pinnedIDs), forKey: "pinnedIDs") } }
     @Published var showWidget: Bool { didSet { defaults.set(showWidget, forKey: "showWidget") } }
+    @Published var widgetSize: WidgetSize { didSet { defaults.set(widgetSize.rawValue, forKey: "widgetSize") } }
     @Published var showMenuBarIcon: Bool { didSet { defaults.set(showMenuBarIcon, forKey: "showMenuBarIcon") } }
     @Published var menuBarPercent: Bool { didSet { defaults.set(menuBarPercent, forKey: "menuBarPercent") } }
     @Published var inputLockEnabled: Bool { didSet { defaults.set(inputLockEnabled, forKey: "inputLockEnabled") } }
@@ -65,6 +72,7 @@ final class Settings: ObservableObject {
         mutedAlertIDs = Set(defaults.stringArray(forKey: "mutedAlertIDs") ?? [])
         pinnedIDs = Set(defaults.stringArray(forKey: "pinnedIDs") ?? [])
         showWidget = defaults.bool(forKey: "showWidget")
+        widgetSize = WidgetSize(rawValue: defaults.string(forKey: "widgetSize") ?? "") ?? .medium
         showMenuBarIcon = defaults.bool(forKey: "showMenuBarIcon")
         menuBarPercent = defaults.bool(forKey: "menuBarPercent")
         inputLockEnabled = defaults.bool(forKey: "inputLockEnabled")

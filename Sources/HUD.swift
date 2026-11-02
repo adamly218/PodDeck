@@ -120,7 +120,7 @@ struct HUDView: View {
         }
         .padding(compact ? 12 : 16)
         .frame(width: compact ? 320 : 400)
-        .background(VisualEffectBackground(material: .hudWindow))
+        .background(VisualEffectBackground(material: .hudWindow, cornerRadius: compact ? 16 : 22))
         .clipShape(RoundedRectangle(cornerRadius: compact ? 16 : 22, style: .continuous))
     }
 

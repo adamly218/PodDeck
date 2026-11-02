@@ -69,7 +69,7 @@ struct DashboardView: View {
             .padding(.horizontal, 14).padding(.vertical, 10)
         }
         .frame(width: 360)
-        .background(VisualEffectBackground(material: .popover))
+        .background(VisualEffectBackground(material: .popover, cornerRadius: 12))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Color.primary.opacity(0.12)))
     }

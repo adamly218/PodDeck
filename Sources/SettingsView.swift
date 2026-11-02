@@ -30,7 +30,14 @@ struct SettingsView: View {
                         .font(.caption).foregroundColor(.secondary)
                 }
             }
-            Toggle("Show desktop widget", isOn: $settings.showWidget)
+            Section("Desktop widget") {
+                Toggle("Show desktop widget", isOn: $settings.showWidget)
+                Picker("Size", selection: $settings.widgetSize) {
+                    ForEach(WidgetSize.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
+                Text("Drag the widget anywhere on the desktop.").font(.caption).foregroundColor(.secondary)
+            }
             Section("Audio Input Lock") {
                 Toggle("Keep this microphone selected", isOn: $settings.inputLockEnabled)
                 Picker("Microphone", selection: $settings.inputLockUID) {
